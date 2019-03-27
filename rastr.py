@@ -56,7 +56,6 @@ def generateRandomFella():
 
 # Choose Selection Algorithm: seleciona o tipo de algorítmo escolhido
 
-
 def chooseSelectionAlgorithm(population, population_chance, population_results):
     fella = 0
 
@@ -83,7 +82,6 @@ def getDecimalValue(ind):
     return xValue, yValue
 
 # Get Best Generation Fella: retorna o melhor indivíduo da geração, e seus valores
-
 
 def getBestGenerationFella(population, population_results, population_fitness):
     best_result = min(population_results)
@@ -127,7 +125,6 @@ def getPopulationFitness(population):
 
 # Get Fitness: retorna o fitness do invidíduo, além do seu resultado em rastrigin
 
-
 def getFitness(ind):
     xValue, yValue = getDecimalValue(ind)
     result = rastrigin(xValue, yValue)
@@ -143,7 +140,6 @@ def getFitness(ind):
 
 # Rastrigin: função de rastrigin
 
-
 def rastrigin(x, y):
     return 20 + (x ** 2) + (y ** 2) - (10 * (math.cos(2 * math.pi * x) + math.cos(2 * math.pi * y)))
 
@@ -151,6 +147,7 @@ def rastrigin(x, y):
 ## ALGORÍTMOS DE SELEÇÃO ##
 
 # Roleta: escolhe um indivíduo aleatóriamente, considerando os pesos
+
 def selectFellaRoullete(population_chance):
     roullete = []
 
@@ -165,7 +162,6 @@ def selectFellaRoullete(population_chance):
     return fella
 
 # Torneio: escolhe 20% da população aleatóriamente, seleciona o melhor dentre eles
-
 
 def selectFellaBR(population, population_results):
     fellas = []
@@ -256,6 +252,7 @@ def crossover(chromo1, chromo2):
         return child1, child2
 
     else:
+        
         return chromo1, chromo2
 
 
