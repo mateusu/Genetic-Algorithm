@@ -1,20 +1,22 @@
 import random
 import math
 from random import randint
+import matplotlib.pyplot as plt
+
 
 ## OPÇÕES DE POPULAÇÃO ##
 
 # tamanho da população inicial
-population_size = 40
+population_size = 20
 
 # máximo de gerações
-max_generations = 400
+max_generations = 200
 
 
 ## OPÇÕES DE ALGORÍTMOS DE SELEÇÃO ##
 
 # número de indivíduos escolhidos na seleção por torneio #
-battle_royale_select = int(population_size/5)
+battle_royale_select = int(population_size/4)
 
 # tipo de algorítmos de seleção
 # 0 = roullete
@@ -134,7 +136,7 @@ def getFitness(ind):
     if result > 0:
         fitness = (1/result)
     else:
-        fitness = (1 / 0.0001)
+        fitness = (1 / 0.01)
 
     return result, fitness
 
@@ -282,8 +284,12 @@ def startNewGeneration(population, population_chance, population_results):
 
 
 def start():
+    
     population = []
     generation = 1
+    generations = []
+    best_fitness_per_generation = []
+    average_fitness_per_generation = []
 
     for _ in range(population_size):
         population.append(generateRandomFella())
@@ -297,10 +303,23 @@ def start():
 
         print('Geração:', generation)
         printResults(best_result, best_fella, best_fitness)
+
+        generations.append(generation)
+        best_fitness_per_generation.append(best_fitness)
+        average_fitness = sum(population_fitness)/len(population_fitness)
+        average_fitness_per_generation.append(average_fitness)
+
         population = startNewGeneration(
             population, population_chance, population_results)
 
         generation += 1
-
+   
+    plt.plot(generations, average_fitness_per_generation, color='g', label='Average')
+    plt.plot(generations, best_fitness_per_generation, color='orange', label='Best')
+    plt.xlabel('Generations')
+    plt.ylabel('Fitness')
+    plt.title('Fitness per generation')
+    plt.legend(loc='lower right')
+    plt.show()
 
 start()
