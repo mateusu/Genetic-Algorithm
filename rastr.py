@@ -1,5 +1,6 @@
 import random
 import math
+import time
 from random import randint
 import matplotlib.pyplot as plt
 
@@ -7,7 +8,7 @@ import matplotlib.pyplot as plt
 ## OPÇÕES DE POPULAÇÃO ##
 
 # tamanho da população inicial
-population_size = 20
+population_size = 200
 
 # máximo de gerações
 max_generations = 200
@@ -16,12 +17,12 @@ max_generations = 200
 ## OPÇÕES DE ALGORÍTMOS DE SELEÇÃO ##
 
 # número de indivíduos escolhidos na seleção por torneio #
-battle_royale_select = int(population_size/4)
+battle_royale_select = int(population_size/10)
 
 # tipo de algorítmos de seleção
 # 0 = roullete
 # 1 = torneio
-selection_type = 1
+selection_type = 0
 
 
 ## OPÇÕES DE CROSSOVER ##
@@ -37,13 +38,13 @@ crossover_chance = 0.7
 
 # 0 = muta n genes aleatórios
 # 1 = percorre cada gene, decide se vai mutar ou não
-mutation_type = 1
+mutation_type = 0
 
 # número de genes a serem mutados
-mutation_number = 3
+mutation_number = 1
 
 # chance de acontecer a mutação
-mutation_chance = 0.05
+mutation_chance = 0.1
 
 
 ## FUNÇÕES UTILITÁRIAS ##
@@ -57,6 +58,7 @@ def generateRandomFella():
     return fella
 
 # Choose Selection Algorithm: seleciona o tipo de algorítmo escolhido
+
 
 def chooseSelectionAlgorithm(population, population_chance, population_results):
     fella = 0
@@ -79,11 +81,12 @@ def getDecimalValue(ind):
     xValue = float(xValue)
     yValue = int("".join(str(x) for x in yBits), 2)
     yValue = float(yValue)
-    xValue = (xValue - 512) / 100
-    yValue = (yValue - 512) / 100
+    xValue = ((xValue) * 0.00978) - 5
+    yValue = ((yValue) * 0.00978) - 5
     return xValue, yValue
 
 # Get Best Generation Fella: retorna o melhor indivíduo da geração, e seus valores
+
 
 def getBestGenerationFella(population, population_results, population_fitness):
     best_result = min(population_results)
@@ -127,6 +130,7 @@ def getPopulationFitness(population):
 
 # Get Fitness: retorna o fitness do invidíduo, além do seu resultado em rastrigin
 
+
 def getFitness(ind):
     xValue, yValue = getDecimalValue(ind)
     result = rastrigin(xValue, yValue)
@@ -136,11 +140,12 @@ def getFitness(ind):
     if result > 0:
         fitness = (1/result)
     else:
-        fitness = (1 / 0.01)
+        fitness = (1 / 0.001)
 
     return result, fitness
 
 # Rastrigin: função de rastrigin
+
 
 def rastrigin(x, y):
     return 20 + (x ** 2) + (y ** 2) - (10 * (math.cos(2 * math.pi * x) + math.cos(2 * math.pi * y)))
@@ -151,17 +156,30 @@ def rastrigin(x, y):
 # Roleta: escolhe um indivíduo aleatóriamente, considerando os pesos
 
 def selectFellaRoullete(population_chance):
-    roullete = []
+    roullete_list = []
+    sum = 0
+    for prob in population_chance:
+        sum += prob
+        roullete_list.append(sum)
 
-    for i in range(len(population_chance)):
-        times = int(population_chance[i] * 1000)
-        for _ in range(times):
-            roullete.append(i)
-
-    selected = randint(0, len(roullete)-1)
-    fella = roullete[selected]
+    fella = roullete_spin(roullete_list)
 
     return fella
+
+# Roleta: spin da roleta
+
+def roullete_spin(roullete_list):
+    sorted_number = random.uniform(0, 1)
+    sorted_guy = 0
+
+    for i in range(len(roullete_list)):
+        if sorted_number <= roullete_list[i]:
+            sorted_guy = i
+            break
+        elif i == (len(roullete_list) - 1) and sorted_number <= 1:
+            sorted_guy = i
+
+    return sorted_guy
 
 # Torneio: escolhe 20% da população aleatóriamente, seleciona o melhor dentre eles
 
@@ -210,6 +228,7 @@ def randomMutation(children):
 
 # Iterated Mutation: percorre cada gene e decide se mutará ou não
 
+
 def iteratedMutation(children):
     for i in range(len(children)):
 
@@ -246,7 +265,7 @@ def crossover(chromo1, chromo2):
         if mutation_type == 0:
             child1 = randomMutation(child1)
             child2 = randomMutation(child2)
-     
+
         if mutation_type == 1:
             child1 = iteratedMutation(child1)
             child2 = iteratedMutation(child2)
@@ -254,7 +273,7 @@ def crossover(chromo1, chromo2):
         return child1, child2
 
     else:
-        
+
         return chromo1, chromo2
 
 
@@ -284,7 +303,9 @@ def startNewGeneration(population, population_chance, population_results):
 
 
 def start():
-    
+
+    start = time.time()
+
     population = []
     generation = 1
     generations = []
@@ -313,13 +334,17 @@ def start():
             population, population_chance, population_results)
 
         generation += 1
-   
-    plt.plot(generations, average_fitness_per_generation, color='g', label='Average')
-    plt.plot(generations, best_fitness_per_generation, color='orange', label='Best')
+
+    end = time.time()
+    plt.plot(generations, average_fitness_per_generation,
+             color='g', label='Average')
+    plt.plot(generations, best_fitness_per_generation,
+             color='orange', label='Best')
     plt.xlabel('Generations')
     plt.ylabel('Fitness')
     plt.title('Fitness per generation')
     plt.legend(loc='lower right')
     plt.show()
 
+    print('Tempo de execução:', end - start)
 start()
