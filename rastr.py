@@ -135,13 +135,8 @@ def getFitness(ind):
     xValue, yValue = getDecimalValue(ind)
     result = rastrigin(xValue, yValue)
 
-    fitness = 0
-
-    if result > 0:
-        fitness = (1/result)
-    else:
-        fitness = (1 / 0.001)
-
+    fitness = 100 - result
+    
     return result, fitness
 
 # Rastrigin: função de rastrigin
