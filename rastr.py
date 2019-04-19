@@ -22,7 +22,7 @@ battle_royale_select = int(population_size/10)
 # tipo de algorítmos de seleção
 # 0 = roullete
 # 1 = torneio
-selection_type = 0
+selection_type = 1
 
 
 ## OPÇÕES DE CROSSOVER ##
@@ -77,14 +77,17 @@ def chooseSelectionAlgorithm(population, population_chance, population_results):
 def getDecimalValue(ind):
     xBits = ind[:len(ind)//2]
     yBits = ind[len(ind)//2:]
-    xValue = int("".join(str(x) for x in xBits), 2)
-    xValue = float(xValue)
-    yValue = int("".join(str(x) for x in yBits), 2)
-    yValue = float(yValue)
-    xValue = ((xValue) * 0.00978) - 5
-    yValue = ((yValue) * 0.00978) - 5
-    return xValue, yValue
+   
+    x = convertValue(xBits)
+    y = convertValue(yBits)
+    return x, y
 
+def convertValue(bitValue):
+    decValue = int("".join(str(x) for x in bitValue), 2)
+    decValue = float(decValue)
+    decValue = ((decValue) * 0.00978) - 5
+    return decValue
+    
 # Get Best Generation Fella: retorna o melhor indivíduo da geração, e seus valores
 
 
