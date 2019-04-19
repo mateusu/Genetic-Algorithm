@@ -3,6 +3,7 @@ import math
 import time
 from random import randint
 import matplotlib.pyplot as plt
+from matplotlib.offsetbox import AnchoredText
 
 
 ## OPÇÕES DE POPULAÇÃO ##
@@ -11,7 +12,7 @@ import matplotlib.pyplot as plt
 population_size = 200
 
 # máximo de gerações
-max_generations = 200
+max_generations = 100
 
 
 ## OPÇÕES DE ALGORÍTMOS DE SELEÇÃO ##
@@ -334,14 +335,25 @@ def start():
         generation += 1
 
     end = time.time()
+
     plt.plot(generations, average_fitness_per_generation,
-             color='g', label='Average')
+             color='orange', label='Average')
     plt.plot(generations, best_fitness_per_generation,
-             color='orange', label='Best')
+             color='blue', label='Best')
     plt.xlabel('Generations')
     plt.ylabel('Fitness')
     plt.title('Fitness per generation')
     plt.legend(loc='lower right')
+
+    selectiontype = "roullete" if selection_type == 0 else "tournament"
+    mutationtype = "n bits mutation" if mutation_type == 0 else "bit to bit"
+    mutatedgenes = mutation_number if mutation_type == 0 else "random"
+    run_config = AnchoredText("population_size={}\n\nselection_type={}\nmutation_type={}\n\nmutation_chance={}\nmutated_genes={}\ncrossover_chance={}".format(population_size, selectiontype, mutationtype, mutation_chance, mutatedgenes, crossover_chance), 
+                loc=5, pad=0.4, 
+                borderpad=2)
+
+    plt.gca().add_artist(run_config)
+
     plt.show()
 
     print('Tempo de execução:', end - start)
