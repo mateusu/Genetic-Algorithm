@@ -1,5 +1,6 @@
 import random
 import math
+import numpy as np
 import time
 from random import randint
 import matplotlib.pyplot as plt
@@ -9,10 +10,13 @@ from matplotlib.offsetbox import AnchoredText
 ## OPÇÕES DE POPULAÇÃO ##
 
 # tamanho da população inicial
-population_size = 200
+population_size = 100
+
+#quantas vezes irá rodar o algorítmo
+repeat = 10
 
 # máximo de gerações
-max_generations = 100
+max_generations = 200
 
 
 ## OPÇÕES DE ALGORÍTMOS DE SELEÇÃO ##
@@ -23,7 +27,7 @@ battle_royale_select = int(population_size/10)
 # tipo de algorítmos de seleção
 # 0 = roullete
 # 1 = torneio
-selection_type = 1
+selection_type = 0
 
 
 ## OPÇÕES DE CROSSOVER ##
@@ -42,10 +46,10 @@ crossover_chance = 0.7
 mutation_type = 0
 
 # número de genes a serem mutados
-mutation_number = 1
+mutation_number = 2
 
 # chance de acontecer a mutação
-mutation_chance = 0.1
+mutation_chance = 0.05
 
 
 ## FUNÇÕES UTILITÁRIAS ##
@@ -192,7 +196,7 @@ def selectFellaBR(population, population_results):
     for i in range(0, len(fellas)):
         selected.append(population[fellas[i]])
         selected_fitness.append(population_results[fellas[i]])
-
+    
     min_fitness = min(selected_fitness)
     fella = selected[selected_fitness.index(min_fitness)]
     fella = population.index(fella)
@@ -305,40 +309,77 @@ def start():
 
     start = time.time()
 
-    population = []
-    generation = 1
-    generations = []
-    best_fitness_per_generation = []
-    average_fitness_per_generation = []
+    population_init = []
+    best_fitness_list = []
+    average_fitness_list = []
 
     for _ in range(population_size):
-        population.append(generateRandomFella())
+        fella = generateRandomFella()
+        population_init.append(fella)
 
-    for _ in range(max_generations):
-        population_chance, population_results, population_fitness = getPopulationFitness(
-            population)
+    for i in range(repeat):
+        population = population_init
+        generation = 1
+        best_fitness_per_generation = []
+        average_fitness_per_generation = []
 
-        best_result, best_fella, best_fitness = getBestGenerationFella(
-            population, population_results, population_fitness)
+        for _ in range(max_generations):
+            
+            population_chance, population_results, population_fitness = getPopulationFitness(
+                population)
 
-        print('Geração:', generation)
-        printResults(best_result, best_fella, best_fitness)
+            best_result, best_fella, best_fitness = getBestGenerationFella(
+                population, population_results, population_fitness)
 
-        generations.append(generation)
-        best_fitness_per_generation.append(best_fitness)
-        average_fitness = sum(population_fitness)/len(population_fitness)
-        average_fitness_per_generation.append(average_fitness)
+            print('Geração:', generation)
+            printResults(best_result, best_fella, best_fitness)
 
-        population = startNewGeneration(
-            population, population_chance, population_results)
+            best_fitness_per_generation.append(best_fitness)
+            average_fitness = sum(population_fitness)/len(population_fitness)
+            average_fitness_per_generation.append(average_fitness)
 
-        generation += 1
+            population = startNewGeneration(
+                population, population_chance, population_results)
+
+            generation += 1
+
+        best_fitness_list.append(best_fitness_per_generation)
+        average_fitness_list.append(average_fitness_per_generation)
+
 
     end = time.time()
 
-    plt.plot(generations, average_fitness_per_generation,
+    cleanData(best_fitness_list, average_fitness_list)
+  
+    print('Tempo de execução:', end - start)
+
+
+def cleanData(best_fitness_list, average_fitness_list):
+    
+    average_fitness = []
+    best_fitness = []
+    
+    for i in range(repeat):
+        bt_vector = np.array(best_fitness_list[i])
+        av_vector = np.array(average_fitness_list[i])
+        best_fitness.append(bt_vector)
+        average_fitness.append(av_vector)
+    
+    best_fitness = sum(best_fitness)
+    average_fitness = sum(average_fitness)
+
+    best_fitness = best_fitness/repeat
+    average_fitness = average_fitness/repeat
+
+    plotGraph(best_fitness, average_fitness)
+
+
+def plotGraph(best_fitness, average_fitness):
+    generations = [i+1 for i in range(max_generations)]
+
+    plt.plot(generations, average_fitness,
              color='orange', label='Average')
-    plt.plot(generations, best_fitness_per_generation,
+    plt.plot(generations, best_fitness,
              color='blue', label='Best')
     plt.xlabel('Generations')
     plt.ylabel('Fitness')
@@ -356,5 +397,4 @@ def start():
 
     plt.show()
 
-    print('Tempo de execução:', end - start)
 start()
