@@ -184,7 +184,7 @@ def roullete_spin(roullete_list):
 
     return sorted_guy
 
-# Torneio: escolhe 20% da população aleatóriamente, seleciona o melhor dentre eles
+# Torneio: escolhe n% da população aleatóriamente, seleciona o melhor dentre eles
 
 def selectFellaBR(population, population_results):
     fellas = []
@@ -197,8 +197,8 @@ def selectFellaBR(population, population_results):
         selected.append(population[fellas[i]])
         selected_fitness.append(population_results[fellas[i]])
     
-    min_fitness = min(selected_fitness)
-    fella = selected[selected_fitness.index(min_fitness)]
+    min_result = min(selected_fitness)
+    fella = selected[selected_fitness.index(min_result)]
     fella = population.index(fella)
 
     return fella
