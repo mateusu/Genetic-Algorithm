@@ -22,13 +22,15 @@ max_generations = 300
 ## OPÇÕES DE ALGORÍTMOS DE SELEÇÃO ##
 
 # número de indivíduos escolhidos na seleção por torneio #
-battle_royale_select = int(population_size/20)
+battle_royale_select = 0.05
 
 # tipo de algorítmos de seleção
 # 0 = roullete
 # 1 = torneio
 selection_type = 0
 
+# sempre passa o melhor indivíduo para a nova geração #
+always_keep_the_best = False
 
 ## OPÇÕES DE CROSSOVER ##
 
@@ -36,7 +38,7 @@ selection_type = 0
 crossover_mask = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 # chance de o crossover acontecer
-crossover_chance = 0.1
+crossover_chance = 0.7
 
 
 ## OPÇÕES DE MUTAÇÃO ##
@@ -49,7 +51,7 @@ mutation_type = 0
 mutation_number = 2
 
 # chance de acontecer a mutação
-mutation_chance = 0.2
+mutation_chance = 0.4
 
 
 ## FUNÇÕES UTILITÁRIAS ##
@@ -79,8 +81,6 @@ def getPopulation():
 
 def chooseSelectionAlgorithm(population, population_chance, population_results):
     fella = 0
-
-    #selection_type = randint(0, 1)
 
     if selection_type == 0:
         fella = selectFellaRoullete(population_chance)
@@ -204,7 +204,9 @@ def selectFellaBR(population, population_results):
     fellas = []
     selected = []
     selected_fitness = []
-    for i in range(battle_royale_select):
+
+
+    for i in range(int(population_size * battle_royale_select)):
         fellas.append(randint(0, population_size-1))
 
     for i in range(0, len(fellas)):
@@ -243,10 +245,10 @@ def randomMutation(children):
 
     return children
 
-# Iterated Mutation: percorre cada gene e decide se mutará ou não
+# Bit to bit mutation: percorre cada gene e decide se mutará ou não
 
 
-def iteratedMutation(children):
+def btbMutation(children):
     for i in range(len(children)):
 
         chance = random.uniform(0, 1)
@@ -284,8 +286,8 @@ def crossover(chromo1, chromo2):
             child2 = randomMutation(child2)
 
         if mutation_type == 1:
-            child1 = iteratedMutation(child1)
-            child2 = iteratedMutation(child2)
+            child1 = btbMutation(child1)
+            child2 = btbMutation(child2)
 
         return child1, child2
 
@@ -304,12 +306,25 @@ def startNewGeneration(population, population_chance, population_results):
 
     while len(new_population) < len(population):
 
-        x = chooseSelectionAlgorithm(
+        if(always_keep_the_best):
+            if len(new_population) == 0:
+                best_fella = min(population_results)
+                x = population_results.index(best_fella)
+            else: 
+                x = chooseSelectionAlgorithm(
             population, population_chance, population_results)
+        else:
+            x = chooseSelectionAlgorithm(
+                population, population_chance, population_results)
+
         y = chooseSelectionAlgorithm(
             population, population_chance, population_results)
 
-        x, y = crossover(population[x], population[y])
+        if len(new_population) > 0:
+            x, y = crossover(population[x], population[y])
+        else:
+            x = population[x]
+            y = population[y]
 
         new_population.append(x)
         new_population.append(y)
