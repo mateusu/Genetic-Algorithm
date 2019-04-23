@@ -10,19 +10,19 @@ from matplotlib.offsetbox import AnchoredText
 ## OPÇÕES DE POPULAÇÃO ##
 
 # tamanho da população inicial
-population_size = 100
+population_size = 0
 
 #quantas vezes irá rodar o algorítmo
-repeat = 10
+repeat = 20
 
 # máximo de gerações
-max_generations = 200
+max_generations = 300
 
 
 ## OPÇÕES DE ALGORÍTMOS DE SELEÇÃO ##
 
 # número de indivíduos escolhidos na seleção por torneio #
-battle_royale_select = int(population_size/10)
+battle_royale_select = int(population_size/20)
 
 # tipo de algorítmos de seleção
 # 0 = roullete
@@ -36,7 +36,7 @@ selection_type = 0
 crossover_mask = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 # chance de o crossover acontecer
-crossover_chance = 0.7
+crossover_chance = 0.1
 
 
 ## OPÇÕES DE MUTAÇÃO ##
@@ -49,7 +49,7 @@ mutation_type = 0
 mutation_number = 2
 
 # chance de acontecer a mutação
-mutation_chance = 0.05
+mutation_chance = 0.2
 
 
 ## FUNÇÕES UTILITÁRIAS ##
@@ -62,11 +62,25 @@ def generateRandomFella():
         fella.append(randint(0, 1))
     return fella
 
-# Choose Selection Algorithm: seleciona o tipo de algorítmo escolhido
+# Get Population: pega a população gerada no arquivo txt
 
+def getPopulation():
+    population = []
+    with open('population.txt', 'r') as file:
+        for line in file:
+            line = line.strip()
+            ind = []
+            for c in line:
+                ind.append(int(c))
+            population.append(ind)
+    return population
+
+# Choose Selection Algorithm: seleciona o tipo de algorítmo escolhido
 
 def chooseSelectionAlgorithm(population, population_chance, population_results):
     fella = 0
+
+    #selection_type = randint(0, 1)
 
     if selection_type == 0:
         fella = selectFellaRoullete(population_chance)
@@ -306,23 +320,22 @@ def startNewGeneration(population, population_chance, population_results):
 
 
 def start():
-
+    
+    global population_size
     start = time.time()
 
-    population_init = []
+    population_init = getPopulation()
+    population_size = len(population_init)
     best_fitness_list = []
     average_fitness_list = []
+    best_result_list = []
 
-    for _ in range(population_size):
-        fella = generateRandomFella()
-        population_init.append(fella)
-
-    for i in range(repeat):
+    for _ in range(repeat):
         population = population_init
         generation = 1
         best_fitness_per_generation = []
         average_fitness_per_generation = []
-
+        best_result_exec = 100
         for _ in range(max_generations):
             
             population_chance, population_results, population_fitness = getPopulationFitness(
@@ -331,6 +344,8 @@ def start():
             best_result, best_fella, best_fitness = getBestGenerationFella(
                 population, population_results, population_fitness)
 
+            if best_result < best_result_exec:
+                best_result_exec = best_result
             print('Geração:', generation)
             printResults(best_result, best_fella, best_fitness)
 
@@ -342,19 +357,19 @@ def start():
                 population, population_chance, population_results)
 
             generation += 1
-
+        best_result_list.append(best_result_exec) 
         best_fitness_list.append(best_fitness_per_generation)
         average_fitness_list.append(average_fitness_per_generation)
 
 
     end = time.time()
 
-    cleanData(best_fitness_list, average_fitness_list)
+    cleanData(best_fitness_list, average_fitness_list, best_result_list)
   
     print('Tempo de execução:', end - start)
 
 
-def cleanData(best_fitness_list, average_fitness_list):
+def cleanData(best_fitness_list, average_fitness_list, best_result_list):
     
     average_fitness = []
     best_fitness = []
@@ -370,11 +385,11 @@ def cleanData(best_fitness_list, average_fitness_list):
 
     best_fitness = best_fitness/repeat
     average_fitness = average_fitness/repeat
+    best_result_av = sum(best_result_list)/repeat
+    plotGraph(best_fitness, average_fitness, best_result_av)
 
-    plotGraph(best_fitness, average_fitness)
 
-
-def plotGraph(best_fitness, average_fitness):
+def plotGraph(best_fitness, average_fitness, best_result):
     generations = [i+1 for i in range(max_generations)]
 
     plt.plot(generations, average_fitness,
@@ -389,7 +404,7 @@ def plotGraph(best_fitness, average_fitness):
     selectiontype = "roullete" if selection_type == 0 else "tournament"
     mutationtype = "n bits mutation" if mutation_type == 0 else "bit to bit"
     mutatedgenes = mutation_number if mutation_type == 0 else "random"
-    run_config = AnchoredText("population_size={}\n\nselection_type={}\nmutation_type={}\n\nmutation_chance={}\nmutated_genes={}\ncrossover_chance={}".format(population_size, selectiontype, mutationtype, mutation_chance, mutatedgenes, crossover_chance), 
+    run_config = AnchoredText("population_size={}\n\nselection_type={}\nmutation_type={}\n\nmutation_chance={}\nmutated_genes={}\ncrossover_chance={}\n\nbest_result_average={}".format(population_size, selectiontype, mutationtype, mutation_chance, mutatedgenes, crossover_chance, best_result), 
                 loc=5, pad=0.4, 
                 borderpad=2)
 
