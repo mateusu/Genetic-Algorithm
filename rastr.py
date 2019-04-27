@@ -10,10 +10,10 @@ from matplotlib.offsetbox import AnchoredText
 ## OPÇÕES DE POPULAÇÃO ##
 
 # tamanho da população inicial
-population_size = 0
+population_size = 200
 
 #quantas vezes irá rodar o algorítmo
-repeat = 20
+repeat = 10
 
 # máximo de gerações
 max_generations = 300
@@ -75,6 +75,7 @@ def getPopulation():
             for c in line:
                 ind.append(int(c))
             population.append(ind)
+    population = population[:population_size]
     return population
 
 # Choose Selection Algorithm: seleciona o tipo de algorítmo escolhido
@@ -336,11 +337,9 @@ def startNewGeneration(population, population_chance, population_results):
 
 def start():
     
-    global population_size
     start = time.time()
 
     population_init = getPopulation()
-    population_size = len(population_init)
     best_fitness_list = []
     average_fitness_list = []
     best_result_list = []
@@ -401,10 +400,11 @@ def cleanData(best_fitness_list, average_fitness_list, best_result_list):
     best_fitness = best_fitness/repeat
     average_fitness = average_fitness/repeat
     best_result_av = sum(best_result_list)/repeat
-    plotGraph(best_fitness, average_fitness, best_result_av)
+    std_deviation = np.std(best_result_list, ddof=1, dtype = np.float64)
+    plotGraph(best_fitness, average_fitness, best_result_av, std_deviation)
 
 
-def plotGraph(best_fitness, average_fitness, best_result):
+def plotGraph(best_fitness, average_fitness, best_result, std_deviation):
     generations = [i+1 for i in range(max_generations)]
 
     plt.plot(generations, average_fitness,
@@ -419,7 +419,7 @@ def plotGraph(best_fitness, average_fitness, best_result):
     selectiontype = "roullete" if selection_type == 0 else "tournament"
     mutationtype = "n bits mutation" if mutation_type == 0 else "bit to bit"
     mutatedgenes = mutation_number if mutation_type == 0 else "random"
-    run_config = AnchoredText("population_size={}\n\nselection_type={}\nmutation_type={}\n\nmutation_chance={}\nmutated_genes={}\ncrossover_chance={}\n\nbest_result_average={}".format(population_size, selectiontype, mutationtype, mutation_chance, mutatedgenes, crossover_chance, best_result), 
+    run_config = AnchoredText("population_size={}\n\nselection_type={}\nmutation_type={}\n\nmutation_chance={}\nmutated_genes={}\ncrossover_chance={}\n\nbest_result_average={}\nstd_deviation={}".format(population_size, selectiontype, mutationtype, mutation_chance, mutatedgenes, crossover_chance, best_result, std_deviation), 
                 loc=5, pad=0.4, 
                 borderpad=2)
 
