@@ -32,6 +32,7 @@ selection_type = 0
 # sempre passa o melhor indivíduo para a nova geração #
 always_keep_the_best = False
 
+
 ## OPÇÕES DE CROSSOVER ##
 
 # máscara de onde acontecerá o crossover
@@ -107,9 +108,9 @@ def convertValue(bitValue):
     decValue = float(decValue)
     decValue = ((decValue) * 0.00978) - 5
     return decValue
-    
-# Get Best Generation Fella: retorna o melhor indivíduo da geração, e seus valores
 
+
+# Get Best Generation Fella: retorna o melhor indivíduo da geração, e seus valores
 
 def getBestGenerationFella(population, population_results, population_fitness):
     best_result = min(population_results)
@@ -151,8 +152,8 @@ def getPopulationFitness(population):
 
     return population_chance, population_results, population_fitness
 
-# Get Fitness: retorna o fitness do invidíduo, além do seu resultado em rastrigin
 
+# Get Fitness: retorna o fitness do invidíduo, além do seu resultado em rastrigin
 
 def getFitness(ind):
     xValue, yValue = getDecimalValue(ind)
@@ -162,14 +163,15 @@ def getFitness(ind):
     
     return result, fitness
 
-# Rastrigin: função de rastrigin
 
+# Rastrigin: função de rastrigin
 
 def rastrigin(x, y):
     return 20 + (x ** 2) + (y ** 2) - (10 * (math.cos(2 * math.pi * x) + math.cos(2 * math.pi * y)))
 
 
 ## ALGORÍTMOS DE SELEÇÃO ##
+
 
 # Roleta: escolhe um indivíduo aleatóriamente, considerando os pesos
 
@@ -183,6 +185,7 @@ def selectFellaRoullete(population_chance):
     fella = roullete_spin(roullete_list)
 
     return fella
+
 
 # Roleta: spin da roleta
 
@@ -198,6 +201,7 @@ def roullete_spin(roullete_list):
             sorted_guy = i
 
     return sorted_guy
+
 
 # Torneio: escolhe n% da população aleatóriamente, seleciona o melhor dentre eles
 
@@ -246,8 +250,8 @@ def randomMutation(children):
 
     return children
 
-# Bit to bit mutation: percorre cada gene e decide se mutará ou não
 
+# Bit to bit mutation: percorre cada gene e decide se mutará ou não
 
 def btbMutation(children):
     for i in range(len(children)):
