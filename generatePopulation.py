@@ -1,6 +1,6 @@
 from random import randint
 
-population_size = 1000
+population_size = 500
 
 def generateRandomFella():
     fella = []

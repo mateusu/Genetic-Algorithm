@@ -10,10 +10,10 @@ from matplotlib.offsetbox import AnchoredText
 ## OPÇÕES DE POPULAÇÃO ##
 
 # tamanho da população inicial
-population_size = 200
+population_size = 10
 
 #quantas vezes irá rodar o algorítmo
-repeat = 10
+repeat = 20
 
 # máximo de gerações
 max_generations = 300
@@ -22,7 +22,7 @@ max_generations = 300
 ## OPÇÕES DE ALGORÍTMOS DE SELEÇÃO ##
 
 # número de indivíduos escolhidos na seleção por torneio #
-battle_royale_select = 0.05
+battle_royale_select = 0.02
 
 # tipo de algorítmos de seleção
 # 0 = roullete
@@ -30,7 +30,7 @@ battle_royale_select = 0.05
 selection_type = 0
 
 # sempre passa o melhor indivíduo para a nova geração #
-always_keep_the_best = False
+always_keep_the_best = True
 
 
 ## OPÇÕES DE CROSSOVER ##
@@ -39,7 +39,7 @@ always_keep_the_best = False
 crossover_mask = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 # chance de o crossover acontecer
-crossover_chance = 0.7
+crossover_chance = 0.9
 
 
 ## OPÇÕES DE MUTAÇÃO ##
@@ -210,8 +210,10 @@ def selectFellaBR(population, population_results):
     selected = []
     selected_fitness = []
 
+    n = int(population_size * battle_royale_select)
+    if n == 0: n = 1
 
-    for i in range(int(population_size * battle_royale_select)):
+    for i in range(n):
         fellas.append(randint(0, population_size-1))
 
     for i in range(0, len(fellas)):
@@ -410,6 +412,7 @@ def cleanData(best_fitness_list, average_fitness_list, best_result_list):
 
 def plotGraph(best_fitness, average_fitness, best_result, std_deviation):
     generations = [i+1 for i in range(max_generations)]
+    fig, ax = plt.subplots(figsize=(15, 8))
 
     plt.plot(generations, average_fitness,
              color='orange', label='Average')
